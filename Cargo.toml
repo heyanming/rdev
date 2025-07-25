@@ -70,6 +70,10 @@ required-features = ["unstable_grab"]
 name = "tokio_channel"
 required-features = []
 
+[[example]]
+name = "mouse_share"
+required-features = ["serialize", "unstable_grab"]
+
 [[test]]
 name = "grab"
 path = "tests/grab.rs"
