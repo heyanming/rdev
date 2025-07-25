@@ -1,4 +1,5 @@
 use rdev::{Event, EventType, SimulateError, display_size, grab, simulate};
+use serde_json::{from_str, to_writer};
 use std::io::{BufRead, BufReader, Write};
 use std::net::{TcpListener, TcpStream};
 use std::thread;
@@ -15,7 +16,7 @@ fn send_loop(mut stream: TcpStream) {
                     let _ = simulate(&EventType::MouseMove { x: 1.0, y });
                 }
             }
-            if serde_json::to_writer(&mut stream, &event).is_ok() {
+            if to_writer(&mut stream, &event).is_ok() {
                 let _ = stream.write_all(b"\n");
             }
             None
@@ -27,7 +28,7 @@ fn send_loop(mut stream: TcpStream) {
                         x: (width - 1) as f64,
                         y,
                     });
-                    if serde_json::to_writer(&mut stream, &event).is_ok() {
+                    if to_writer(&mut stream, &event).is_ok() {
                         let _ = stream.write_all(b"\n");
                     }
                     return None;
@@ -47,7 +48,7 @@ fn recv_loop(listener: TcpListener) {
                     let reader = BufReader::new(stream);
                     for line in reader.lines() {
                         if let Ok(line) = line {
-                            if let Ok(event) = serde_json::from_str::<Event>(&line) {
+                            if let Ok(event) = from_str::<Event>(&line) {
                                 if let Err(SimulateError) = simulate(&event.event_type) {
                                     eprintln!("Failed to simulate event {:?}", event);
                                 }
